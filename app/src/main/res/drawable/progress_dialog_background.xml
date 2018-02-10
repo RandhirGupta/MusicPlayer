@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright 1/1/18 7:31 PM randhirgupta
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 27/1/18 12:01 AM randhirgupta
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="app_name">MusicPlayer</string>
-
-    <string name="play">Play</string>
-    <string name="pause">Pause</string>
-    <string name="loading">Loading…</string>
-    <string name="progress_message">Please wait…</string>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="8dp" />
+    <solid android:color="#88000000" />
+</shape>

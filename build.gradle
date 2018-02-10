@@ -15,19 +15,25 @@
  */
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: 'buildsystem/dependencies.gradle'
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-android-extensions'
 
 buildscript {
 
-    ext.kotlin_version = '1.2.10'
+    ext.gradleVersion = '3.0.1'
+    ext.kotlin_version = '1.2.21'
     ext.butterKnifeVersion = '8.7.0'
 
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath "com.android.tools.build:gradle:$gradleVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlin_version"
         classpath "com.jakewharton:butterknife-gradle-plugin:$butterKnifeVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -39,30 +45,44 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "https://jitpack.io" }
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
 
 ext {
+    androidApplicationId = "com.randhir.musicplayer"
+    androidVersionCode = 1
+    androidVersionName = "1.0"
 
-    //SDK and tool version
-    minSdkVersion = 18
-    targetSdkVersion = 27
-    compileSdkVersion = 27
-    buildToolsVersion = '27.0.1'
+    dataLibraryVersionCode = 1
+    dataLibraryVersionName = "1.0"
 
-    //App dependencies version
-    supportLibraryVersion = '27.0.2'
-    constraintLayoutVersion = '1.0.2'
-    glideVersion = '3.7.0'
-    daggerVersion = '2.14'
-    butterKnifeVersion = '8.8.1'
+    domainLibraryVersionCode = 1
+    domainLibraryVersionName = "1.0"
 
-    //Test tool versions
-    junitVersion = '4.12'
-    espressCoreVersion = '2.2.2'
-    runnerVersion = '1.0.1'
+    testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+    testApplicationId = "com.randhir.musicplayer" + '.test'
+}
+
+task runUnitTests(dependsOn: [':data:testDebugUnitTest', ':domain:testDebugUnitTest', ':app:testDebugUnitTest']) {
+    description 'Run all unit tests'
+}
+
+task runAcceptanceTests(dependsOn: [':app:connectedAndroidTest']) {
+    description 'Run all acceptance tests.'
+}
+
+task deployDebug(type: Exec, dependsOn: 'app:installDebug') {
+    def rootDir = project.rootDir
+    def localProperties = new File(rootDir, "local.properties")
+    if (localProperties.exists()) {
+        Properties properties = new Properties()
+        localProperties.withInputStream {
+            inputStream -> properties.load(inputStream)
+        }
+        def sdkDir = properties.getProperty('sdk.dir')
+        def adb = "$sdkDir/platform-tools/adb"
+        commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.randhir.musicplayer/com.randhir.musicplayer.presentation.ui.activities.MainActivity'
+    }
 }

@@ -22,39 +22,97 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    defaultConfig {
-        applicationId "com.randhir.musicplayer"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
+    def globalConfiguration = rootProject.ext
 
+    compileSdkVersion globalConfiguration.androidCompileSdkVersion
+    buildToolsVersion globalConfiguration.androidBuildToolsVersion
+
+    defaultConfig {
+        minSdkVersion globalConfiguration.androidMinSdkVersion
+        targetSdkVersion globalConfiguration.androidTargetSdkVersion
+
+        versionCode globalConfiguration.dataLibraryVersionCode
+        versionName globalConfiguration.dataLibraryVersionName
+
+        testInstrumentationRunner globalConfiguration.testInstrumentationRunner
+
+    }
     buildTypes {
+        debug {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    signingConfigs {
+        debug {
+            storeFile file('../buildsystem/debug.keystore')
+            storePassword 'iluvp2hys1c-s'
+            keyAlias 'cyborg'
+            keyPassword 'iluvp2hys1c-s'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+}
+
+// Required for annotation processing plugins like Dagger
+kapt {
+    generateStubs = true
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-    implementation "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayoutVersion"
+    def unitTestDependencies = rootProject.ext.unitTesting
+    def acceptanceTestDependencies = rootProject.ext.acceptanceTesting
+    def commonDependencies = rootProject.ext.commonDependencies
+    def presentationDependencies = rootProject.ext.presentationDependencies
+    def compileTimeDependencies = rootProject.ext.compileTimeDependencies
+    def dataDependencies = rootProject.ext.dataDependencies
+    def exoPlayerDependencies = rootProject.ext.exoplayerDependencies
 
-    testImplementation "junit:junit:$rootProject.ext.junitVersion"
-    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressCoreVersion"
+    for (dependency in commonDependencies) {
+        compile dependency.value
+    }
 
-    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
-    annotationProcessor "com.google.dagger:dagger-android-processor:$rootProject.ext.daggerVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.ext.butterKnifeVersion"
+    for (dependency in presentationDependencies) {
+        compile dependency.value
+    }
 
-    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
-    compile "com.google.dagger:dagger-android:$rootProject.ext.daggerVersion"
-    compile "com.jakewharton:butterknife:$rootProject.ext.butterKnifeVersion"
+    for (dependency in unitTestDependencies) {
+        testCompile dependency.value
+    }
+
+    for (dependency in acceptanceTestDependencies) {
+        androidTestCompile dependency.value
+    }
+
+    for (dependency in dataDependencies) {
+        compile dependency.value
+    }
+
+    for (dependency in exoPlayerDependencies) {
+        compile dependency.value
+    }
+
+    //Compile Dependencies
+    kapt compileTimeDependencies.daggerCompiler
+    provided compileTimeDependencies.javaxAnnotation
+    provided compileTimeDependencies.javaxInject
+
 }

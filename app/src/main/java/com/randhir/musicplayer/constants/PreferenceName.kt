@@ -1,5 +1,5 @@
 /*
- * Copyright 1/1/18 7:31 PM randhirgupta
+ * Copyright 25/1/18 4:17 PM randhirgupta
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.randhir.musicplayer
+package com.randhir.musicplayer.constants
 
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+/**
+ * @author randhirgupta
+ *  @since 25/1/18.
+ */
+class PreferenceName {
+    companion object {
+        const val SETTING: String = "pref_setting"
     }
 }
